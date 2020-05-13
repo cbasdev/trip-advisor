@@ -14,7 +14,7 @@ export default function Account(){
 
     useEffect(() => {
         firebase.auth().onAuthStateChanged((user) =>{
-            if(user){
+            if(!user){
                 setLogin(false)
             }
             else{
@@ -31,7 +31,7 @@ export default function Account(){
         return <UserLogged />
     }
     else {
-        <UserGuest />
+        return <UserGuest />
     }
     
 }
