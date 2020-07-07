@@ -7,6 +7,7 @@ import * as firebase from 'firebase'
 //Components
 import Loading from '../../components/Loading'
 import InfoUser from '../../components/Account/InfoUser'
+import AccountOptions from '../../components/Account/AccountOptions'
 
 export default function UserLogged(){
 
@@ -22,15 +23,20 @@ export default function UserLogged(){
         })()
     }, [])
     
+    
     return (
         <View style={styles.viewUserInfo}>
 
-            { userInfo && <InfoUser toastRef={toastRef} userInfo={userInfo} />}
+            { userInfo && <InfoUser 
+                            toastRef={toastRef} 
+                            userInfo={userInfo} 
+                            setLoading={setLoading}
+                            setLoadingText={setLoadingText}
+                          />}
             
 
-            <Text>
-                Account Options
-            </Text>
+            <AccountOptions toastRef={toastRef} 
+                            userInfo={userInfo} />
 
             <Button 
                 title='Cerrar Sesion'

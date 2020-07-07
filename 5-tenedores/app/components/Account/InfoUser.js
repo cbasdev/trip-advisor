@@ -13,7 +13,9 @@ export default function InfoUser(props){
             displayName, 
             email 
         },
-        toastRef 
+        toastRef,
+        setLoading,
+        setLoadingText,
     } = props
 
 
@@ -26,12 +28,14 @@ export default function InfoUser(props){
         } else {
             const result = await ImagePicker.launchImageLibraryAsync({
                 allowsEditing: true,
-                aspect: [4, 3]
+                aspect: [3, 3]
             })
             if(result.cancelled){
                 toastRef.current.show('Has cerrado la selección de imagenes')
             } else {
-                uploadImage(result.uri).then(() =>{
+                uploadImage(result.uri)
+                .then(() =>{
+                    updatePhotoUrl()
                     console.log('Imagen Subida')
                 }).catch(() => {
                     toastRef.current.show('Error al Actualizar Avatar')
@@ -42,11 +46,33 @@ export default function InfoUser(props){
     }
 
     const uploadImage = async (uri) => {
+        setLoadingText('Actualizando Avatar')
+        setLoading(true)
         const response = await fetch(uri)
         const blob = await response.blob()
 
         const ref = firebase.storage().ref().child(`avatar/${uid}`)
         return ref.put(blob)
+    }
+
+
+    const updatePhotoUrl = () => {
+        firebase
+            .storage()
+            .ref(`avatar/${uid}`)
+            .getDownloadURL()
+            .then(async response => {
+                const update = {
+                    photoURL: response
+                }
+                await firebase.auth().currentUser.updateProfile(update)
+                setLoading(false)
+
+            })
+            .catch(() => {
+                toastRef.current.show('Error al Actualizar Avatar')
+                setLoading(false)
+            })
     }
 
     return (
