@@ -25,10 +25,19 @@
       "supportsTablet": true
     },
     "android": {
+      "package": "com.sebastianvelezmontoya.tenedores",
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyAKwWNU9Sj21voQpH4w4VtN1Sq9aaxFo3s"
+        }
+      },
       "permissions": [
         "CAMERA_ROLL", 
         "READ_EXTERNAL_STORAGE", 
-        "WRITE_EXTERNAL_STORAGE"
+        "WRITE_EXTERNAL_STORAGE",
+        "LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION"
       ]
     },
     "description": "course of react native",
