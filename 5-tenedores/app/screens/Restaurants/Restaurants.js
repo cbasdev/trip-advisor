@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from "react";
-import { StyleSheet, Text, View } from "react-native";
-import { Icon } from "react-native-elements";
-import { firebaseApp } from "../../utils/firebase";
-import firebase from "firebase/app";
+import React, { useState, useEffect, useCallback } from 'react'
+import { StyleSheet, Text, View } from 'react-native'
+import { Icon } from 'react-native-elements'
+import { useFocusEffect } from '@react-navigation/native'
+
+import { firebaseApp } from '../../utils/firebase'
+import firebase from 'firebase/app'
 import 'firebase/firestore'
 
 //Components
@@ -22,15 +24,17 @@ export default function Restaurants(props) {
 
   useEffect(() => {
     firebase.auth().onAuthStateChanged((userInfo) => {
-        setUser(userInfo)
+      setUser(userInfo)
     })
   }, [])
 
-  useEffect(() => {
-    db.collection('restaurants').get()
-      .then((snap) => {
-        setTotalRestaurants(snap.size)
-      })
+  useFocusEffect(
+    useCallback(() => {
+      db.collection('restaurants')
+        .get()
+        .then((snap) => {
+          setTotalRestaurants(snap.size)
+        })
 
       const resultRestaurants = []
 
@@ -39,8 +43,8 @@ export default function Restaurants(props) {
         .limit(limitRestaurants)
         .get()
         .then((response) => {
-          setStartRestaurants(response.docs[response.docs.length -1])
-          
+          setStartRestaurants(response.docs[response.docs.length - 1])
+
           response.forEach((doc) => {
             const restaurant = doc.data()
             restaurant.id = doc.id
@@ -48,7 +52,8 @@ export default function Restaurants(props) {
           })
           setRestaurants(resultRestaurants)
         })
-  }, [])
+    }, [])
+  )
 
   const handleLoadMore = () => {
     const resultRestaurants = []
@@ -60,27 +65,25 @@ export default function Restaurants(props) {
       .limit(limitRestaurants)
       .get()
       .then((response) => {
-        if(response.docs.length > 0){
-          setStartRestaurants(response.docs[response.docs.length -1])
+        if (response.docs.length > 0) {
+          setStartRestaurants(response.docs[response.docs.length - 1])
         } else {
           setIsLoading(false)
         }
 
-        response.forEach(() => {
+        response.forEach((doc) => {
           const restaurant = doc.data()
           restaurant.id = doc.id
           resultRestaurants.push(restaurant)
         })
 
         setRestaurants([...restaurants, ...resultRestaurants])
-
       })
   }
 
   return (
     <View style={styles.viewBody}>
-
-      <ListRestaurants 
+      <ListRestaurants
         restaurants={restaurants}
         handleLoadMore={handleLoadMore}
         isLoading={isLoading}
@@ -89,33 +92,32 @@ export default function Restaurants(props) {
       <Text>Restaurants...</Text>
       {user && (
         <Icon
-        reverse
-        type="material-community"
-        name="plus"
-        color="#00a680"
-        containerStyle={styles.btnContainer}
-        onPress = {() => navigation.navigate('add-restaurant')}
+          reverse
+          type='material-community'
+          name='plus'
+          color='#00a680'
+          containerStyle={styles.btnContainer}
+          onPress={() => navigation.navigate('add-restaurant')}
         />
       )}
-      
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
   viewBody: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: '#fff',
   },
   btnContainer: {
-    position: "absolute",
+    position: 'absolute',
     bottom: 10,
     right: 10,
-    shadowColor: "black",
+    shadowColor: 'black',
     shadowOffset: {
       width: 2,
       height: 2,
     },
     shadowOpacity: 0.5,
   },
-});
+})
