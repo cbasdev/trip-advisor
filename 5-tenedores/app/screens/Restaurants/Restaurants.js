@@ -89,7 +89,6 @@ export default function Restaurants(props) {
         isLoading={isLoading}
       />
 
-      <Text>Restaurants...</Text>
       {user && (
         <Icon
           reverse

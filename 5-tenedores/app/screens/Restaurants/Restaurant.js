@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { StyleSheet, Text, View, ScrollView, Dimensions } from 'react-native'
-import { Rating, ListItem, Icon } from 'react-native-elements'
+import { Rating, ListItem } from 'react-native-elements'
 import { map } from 'lodash'
+import { useFocusEffect } from '@react-navigation/native'
+
 
 import Loading from '../../components/Loading'
 import CarouselImages from '../../components/Carousel'
@@ -23,17 +25,19 @@ export default function Restaurant(props) {
   const [restaurant, setRestaurant] = useState(null)
   const [rating, setRating] = useState(0)
 
-  useEffect(() => {
-    db.collection('restaurants')
-      .doc(id)
-      .get()
-      .then((response) =>{
-        const data = response.data()
-        data.id = response.id
-        setRestaurant(data)
-        setRating(data.rating)
-      })
-  }, [])
+  useFocusEffect(
+    useCallback(() => {
+      db.collection('restaurants')
+        .doc(id)
+        .get()
+        .then((response) =>{
+          const data = response.data()
+          data.id = response.id
+          setRestaurant(data)
+          setRating(data.rating)
+        })
+    }, [])
+  )
 
   navigation.setOptions({
     title: name 
@@ -61,7 +65,6 @@ export default function Restaurant(props) {
       <ListReview 
         navigation={navigation}
         idRestaurant={restaurant.id}
-        setRating={setRating}
       />
 
     </ScrollView>
