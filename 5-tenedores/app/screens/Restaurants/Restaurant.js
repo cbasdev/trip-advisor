@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useRef } from 'react'
 import { StyleSheet, Text, View, ScrollView, Dimensions } from 'react-native'
-import { Rating, ListItem } from 'react-native-elements'
+import { Rating, ListItem, Icon } from 'react-native-elements'
 import { map } from 'lodash'
 import { useFocusEffect } from '@react-navigation/native'
-
+import Toast from 'react-native-easy-toast'
 
 import Loading from '../../components/Loading'
 import CarouselImages from '../../components/Carousel'
@@ -24,7 +24,19 @@ export default function Restaurant(props) {
   
   const [restaurant, setRestaurant] = useState(null)
   const [rating, setRating] = useState(0)
+  const [isFavorite, setIsFavorite] = useState(false)
+  const [userLogged, setUserLogged] = useState(false)
 
+  const toastRef = useRef()
+
+  navigation.setOptions({
+    title: name 
+  })
+
+  firebase.auth().onAuthStateChanged((user) =>{
+    user ? setUserLogged(true) : setUserLogged(false)
+  })
+  
   useFocusEffect(
     useCallback(() => {
       db.collection('restaurants')
@@ -39,14 +51,30 @@ export default function Restaurant(props) {
     }, [])
   )
 
-  navigation.setOptions({
-    title: name 
-  })
+  const addFavorite = () => {
+    console.log('add fcv')
+  }
+
+  const removeFavorite = () => {
+    console.log('rem fcv')
+
+  }
+
 
   if(!restaurant) return <Loading isVisible={true} text='Cargando...' />
 
   return (
     <ScrollView vertical style={styles.viewBody} >
+      <View style={styles.viewFavorite}>
+        <Icon 
+          type='material-community'
+          name= { isFavorite ? 'heart' : 'heart-outline'}
+          onPress={isFavorite ? removeFavorite : addFavorite}
+          color={ isFavorite ? '#f00' : '#000'}
+          size={35}
+          underlayColor='transparent'
+        />
+      </View>
       <CarouselImages
         arrayImages={restaurant.images}
         height={250}
@@ -66,7 +94,11 @@ export default function Restaurant(props) {
         navigation={navigation}
         idRestaurant={restaurant.id}
       />
-
+      <Toast 
+        ref={toastRef}
+        position='center'
+        opacity={0.9}
+      />
     </ScrollView>
   )
 }
@@ -177,5 +209,16 @@ const styles = StyleSheet.create({
   containerListItem: {
     borderBottomColor: '#d8d8d8',
     borderBottomWidth: 1
+  },
+  viewFavorite:{
+    position:'absolute',
+    top: 0,
+    right: 0,
+    zIndex: 2,
+    backgroundColor: '#fff',
+    borderBottomLeftRadius: 100,
+    padding: 5,
+    paddingLeft: 15
+
   }
 })
