@@ -51,13 +51,60 @@ export default function Restaurant(props) {
     }, [])
   )
 
+  useEffect(() => {
+    if(userLogged && restaurant){
+      db.collection('favorites')
+      .where('idRestaurant', '==', restaurant.id)
+      .where('idUser', '==', firebase.auth().currentUser.uid)
+      .get()
+      .then((response) => {
+        if(response.docs.length === 1){
+          setIsFavorite(true)
+        }
+      })
+    }
+  }, [userLogged, restaurant])
+
   const addFavorite = () => {
-    console.log('add fcv')
+    if(!userLogged){
+      toastRef.current.show('Para usar el sistema de favoritos tienes que estar logeado')
+    } else {
+      const payload = {
+        idUser: firebase.auth().currentUser.uid,
+        idRestaurant: restaurant.id
+      }
+      db.collection('favorites')
+        .add(payload)
+        .then(() => {
+          setIsFavorite(true)
+          toastRef.current.show('Restaurante añadido a favoritos')
+        })
+        .catch(() => {
+          toastRef.current.show('Error al añadir el restaurante a favoritos')
+        })
+    }
   }
 
   const removeFavorite = () => {
-    console.log('rem fcv')
-
+    db.collection('favorites')
+      .where('idRestaurant', '==', restaurant.id)
+      .where('idUser', '==', firebase.auth().currentUser.uid)
+      .get()
+      .then((response) =>{
+        response.forEach((doc) => {
+          const idFavorite = doc.id
+          db.collection('favorites')
+            .doc(idFavorite)
+            .delete()
+            .then(() => {
+              setIsFavorite(false)
+              toastRef.current.show('Restaurante eliminado de favoritos')
+            })
+            .catcn(() => {
+              toastRef.current.show('Error al eliminar de favoritos')
+            })
+        })
+      })
   }
 
 
