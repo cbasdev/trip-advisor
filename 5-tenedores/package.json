@@ -19,6 +19,7 @@
     "expo-location": "~8.1.0",
     "expo-permissions": "~8.1.0",
     "firebase": "~7.9.0",
+    "firesql": "~2.0.2",
     "lodash": "^4.17.15",
     "random-uuid-v4": "~0.0.9",
     "react": "~16.9.0",
